@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  email       String
+  agentType   String?  @map("agent_type")
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  orders      Order[]
+
+  @@map("api_keys")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  brand       String
+  model       String
+  description String
+  price       Float
+  currency    String   @default("HKD")
+  stock       Int      @default(0)
+  imageUrl    String?  @map("image_url")
+  features    String[] @default([])
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  orders      Order[]
+
+  @@map("products")
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  orderNumber       String   @unique @map("order_number")
+  apiKeyId          String   @map("api_key_id")
+  productId         String   @map("product_id")
+  quantity          Int
+  totalPrice        Float    @map("total_price")
+  currency          String   @default("HKD")
+  
+  // Payment info
+  paymentCurrency   String   @map("payment_currency")
+  paymentAmount     Float    @map("payment_amount")
+  paymentAddress    String   @map("payment_address")
+  paymentQrCode     String?  @map("payment_qr_code")
+  txHash            String?  @map("tx_hash")
+  
+  // Shipping info
+  shippingName      String   @map("shipping_name")
+  shippingPhone     String   @map("shipping_phone")
+  shippingAddress   String   @map("shipping_address")
+  shippingCity      String   @map("shipping_city")
+  shippingCountry   String   @map("shipping_country")
+  shippingPostalCode String  @map("shipping_postal_code")
+  trackingNumber    String?  @map("tracking_number")
+  
+  // Status
+  status            String   @default("pending_payment")
+  notes             String?
+  
+  // Timestamps
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  paidAt            DateTime? @map("paid_at")
+  shippedAt         DateTime? @map("shipped_at")
+  completedAt       DateTime? @map("completed_at")
+  cancelledAt       DateTime? @map("cancelled_at")
+  expiresAt         DateTime @map("expires_at")
+  
+  // Relations
+  apiKey            ApiKey   @relation(fields: [apiKeyId], references: [id])
+  product           Product  @relation(fields: [productId], references: [id])
+
+  @@index([apiKeyId])
+  @@index([productId])
+  @@index([status])
+  @@index([orderNumber])
+  @@map("orders")
+}
