@@ -70,10 +70,10 @@ export async function GET(
         expires_at: order.expiresAt,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get order error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to get order' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to get order' },
       { status: 500 }
     );
   }
@@ -126,10 +126,10 @@ export async function DELETE(
       },
       message: 'Order cancelled successfully',
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Cancel order error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to cancel order' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to cancel order' },
       { status: 500 }
     );
   }

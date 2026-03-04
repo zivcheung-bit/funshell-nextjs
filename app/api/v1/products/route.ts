@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get products error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to get products' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to get products' },
       { status: 500 }
     );
   }

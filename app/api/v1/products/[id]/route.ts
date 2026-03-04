@@ -22,10 +22,10 @@ export async function GET(
       success: true,
       data: product,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get product error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to get product' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to get product' },
       { status: 500 }
     );
   }

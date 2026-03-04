@@ -41,10 +41,10 @@ export async function POST(request: NextRequest) {
       },
       message: 'API key created successfully',
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Create API key error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to create API key' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to create API key' },
       { status: 500 }
     );
   }
@@ -86,10 +86,10 @@ export async function GET(request: NextRequest) {
       success: true,
       data: apiKey,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get API key error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to get API key' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to get API key' },
       { status: 500 }
     );
   }

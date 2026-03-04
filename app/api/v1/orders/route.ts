@@ -111,10 +111,10 @@ export async function POST(request: NextRequest) {
       },
       message: 'Order created successfully. Please complete payment within 15 minutes.',
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Create order error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to create order' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to create order' },
       { status: 500 }
     );
   }
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const skip = (page - 1) * limit;
 
-    const where: any = { apiKeyId: apiKeyId! };
+    const where: { apiKeyId: string; status?: string } = { apiKeyId: apiKeyId! };
     if (status) {
       where.status = status;
     }
@@ -175,10 +175,10 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get orders error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to get orders' },
+      { success: false, error: error instanceof Error ? error.message : 'Failed to get orders' },
       { status: 500 }
     );
   }
