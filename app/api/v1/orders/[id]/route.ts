@@ -3,14 +3,15 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const apiKeyId = request.headers.get('x-api-key-id');
     
     const order = await prisma.order.findFirst({
       where: {
-        id: params.id,
+        id,
         apiKeyId: apiKeyId!,
       },
       include: {
@@ -80,14 +81,15 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const apiKeyId = request.headers.get('x-api-key-id');
     
     const order = await prisma.order.findFirst({
       where: {
-        id: params.id,
+        id,
         apiKeyId: apiKeyId!,
       },
     });
@@ -107,7 +109,7 @@ export async function DELETE(
     }
 
     const updatedOrder = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: 'cancelled',
         cancelledAt: new Date(),
