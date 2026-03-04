@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, agentType, description } = body;
 
+    console.log('Creating API key for:', { name, email, agentType });
+
     // Validation
     if (!name || !email) {
       return NextResponse.json(
@@ -17,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Generate API key
     const key = generateApiKey();
+    console.log('Generated API key:', key.substring(0, 10) + '...');
 
     // Create API key in database
     const apiKey = await prisma.apiKey.create({
@@ -28,6 +31,8 @@ export async function POST(request: NextRequest) {
         description,
       },
     });
+
+    console.log('API key created in database:', apiKey.id);
 
     return NextResponse.json({
       success: true,

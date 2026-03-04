@@ -70,11 +70,14 @@ export async function middleware(request: NextRequest) {
       });
 
       if (!key) {
+        console.error('API key not found or inactive:', apiKey.substring(0, 10) + '...');
         return NextResponse.json(
           { success: false, error: 'Invalid or inactive API key' },
           { status: 401 }
         );
       }
+
+      console.log('API key validated:', key.id);
 
       // Add API key info to request headers
       const requestHeaders = new Headers(request.headers);
@@ -86,8 +89,9 @@ export async function middleware(request: NextRequest) {
         },
       });
     } catch (error) {
+      console.error('Middleware authentication error:', error);
       return NextResponse.json(
-        { success: false, error: 'Authentication failed' },
+        { success: false, error: 'Authentication failed', details: error instanceof Error ? error.message : 'Unknown error' },
         { status: 500 }
       );
     }
