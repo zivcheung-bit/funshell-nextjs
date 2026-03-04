@@ -575,9 +575,9 @@
                         card.innerHTML = `
                             <h3>${product.name}</h3>
                             <p style="color: #666; font-size: 0.9rem;">${product.brand} ${product.model}</p>
-                            <div class="price">${product.price.amount} ${product.price.currency}</div>
-                            <div class="stock ${product.inStock ? 'in-stock' : 'out-of-stock'}">
-                                ${product.inStock ? `库存: ${product.stock}` : '缺货'}
+                            <div class="price">${product.price} ${product.currency}</div>
+                            <div class="stock ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+                                ${product.stock > 0 ? `库存: ${product.stock}` : '缺货'}
                             </div>
                             <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">${product.description}</p>
                         `;
@@ -610,7 +610,7 @@
                     data.data.forEach(product => {
                         const option = document.createElement('option');
                         option.value = product.id;
-                        option.textContent = `${product.name} - ${product.price.amount} ${product.price.currency}`;
+                        option.textContent = `${product.name} - ${product.price} ${product.currency}`;
                         select.appendChild(option);
                     });
                 }
