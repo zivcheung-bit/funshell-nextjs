@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+// Force Node.js runtime
+export const runtime = 'nodejs';
+
 // 管理员 API Key 生成
 export async function POST(request: NextRequest) {
   try {

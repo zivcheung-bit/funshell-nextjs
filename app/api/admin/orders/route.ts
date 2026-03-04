@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
+// Force Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
+
 // 获取所有订单（管理员）
 export async function GET(request: NextRequest) {
   try {

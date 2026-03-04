@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { generateOrderNumber } from '@/lib/utils';
 import { convertHKDToCrypto, getPaymentAddress, generateQRCodeUrl } from '@/lib/payment';
 
+// Force Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const apiKeyId = request.headers.get('x-api-key-id');

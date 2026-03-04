@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Force Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
+
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
