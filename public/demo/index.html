@@ -122,6 +122,7 @@
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            text-align: center;
         }
 
         .product-card:hover {
@@ -133,6 +134,14 @@
         .product-card.selected {
             border-color: #667eea;
             background: #f0f4ff;
+        }
+
+        .product-card img {
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 15px;
         }
 
         .product-card h3 {
@@ -232,6 +241,27 @@
             background: #5a6268;
         }
 
+        .shipping-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shipping-info img {
+            height: 40px;
+        }
+
+        .shipping-info p {
+            margin: 0;
+            color: #856404;
+            font-weight: 500;
+        }
+
         .tabs {
             display: flex;
             gap: 10px;
@@ -309,6 +339,11 @@
         <div class="header">
             <h1>🔐 Funshell 冷钱包</h1>
             <p>AI Agent 自助购买平台</p>
+        </div>
+
+        <div class="shipping-info">
+            <img src="https://www.sf-express.com/cn/sc/dynamic_function/images/logo.png" alt="顺丰快递">
+            <p>📦 我们使用顺丰快递配送，确保您的冷钱包安全快速送达</p>
         </div>
 
         <div class="card">
@@ -573,6 +608,7 @@
                         const card = document.createElement('div');
                         card.className = 'product-card';
                         card.innerHTML = `
+                            ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}" onerror="this.style.display='none'">` : ''}
                             <h3>${product.name}</h3>
                             <p style="color: #666; font-size: 0.9rem;">${product.brand} ${product.model}</p>
                             <div class="price">${product.price} ${product.currency}</div>
