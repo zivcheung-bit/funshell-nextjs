@@ -7,13 +7,36 @@ export async function middleware(request: NextRequest) {
   // Public routes that don't require authentication
   const publicRoutes = [
     '/api/health',
-    '/api/admin',  // Admin routes (temporary for setup)
     '/api/v1/api-keys',  // POST only for creating API keys
     '/api/v1/products',  // GET products is public
   ];
   
-  // Allow admin routes (temporary)
+  // Admin routes require admin API key
   if (path.startsWith('/api/admin')) {
+    // Allow auth endpoint to generate admin keys
+    if (path === '/api/admin/auth') {
+      return NextResponse.next();
+    }
+    
+    const adminKey = request.headers.get('x-admin-key');
+    
+    if (!adminKey) {
+      return NextResponse.json(
+        { success: false, error: 'Admin API key is required' },
+        { status: 401 }
+      );
+    }
+
+    // Validate admin key format
+    if (!adminKey.startsWith('fsk_admin_')) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid admin API key format' },
+        { status: 401 }
+      );
+    }
+
+    // In production, you should store admin keys in database
+    // For now, we just validate the format
     return NextResponse.next();
   }
   

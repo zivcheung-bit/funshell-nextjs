@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funshell 订单管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .filters select, .filters input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+        .orders-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status.pending_payment {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.paid {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status.shipped {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Funshell 订单管理后台</h1>
+            <p>管理所有客户订单和发货</p>
+            <div style="margin-top: 20px;">
+                <input type="password" id="adminApiKey" placeholder="输入管理员 API Key" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; width: 400px; margin-right: 10px;">
+                <button class="btn btn-primary" onclick="saveAdminKey()" style="width: auto; padding: 10px 20px;">保存</button>
+                <a href="/admin/generate-key.html" style="margin-left: 10px; color: white; text-decoration: underline;">生成 API Key</a>
+            </div>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <h3>待支付</h3>
+                <div class="number" id="stat-pending">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>已支付</h3>
+                <div class="number" id="stat-paid">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>已发货</h3>
+                <div class="number" id="stat-shipped">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>已完成</h3>
+                <div class="number" id="stat-completed">-</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select id="statusFilter" onchange="loadOrders()">
+                <option value="">所有状态</option>
+                <option value="pending_payment">待支付</option>
+                <option value="paid">已支付</option>
+                <option value="processing">处理中</option>
+                <option value="shipped">已发货</option>
+                <option value="completed">已完成</option>
+                <option value="cancelled">已取消</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="搜索订单号、客户姓名、电话..." onkeyup="handleSearch()">
+            <button class="btn btn-primary" onclick="loadOrders()">刷新</button>
+        </div>
+
+        <div class="orders-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户</th>
+                        <th>产品</th>
+                        <th>金额</th>
+                        <th>支付</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    <tr>
+                        <td colspan="8" class="loading">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 订单详情模态框 -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <h2>订单详情</h2>
+            <div id="orderDetails"></div>
+            <div class="form-group">
+                <label>更新状态</label>
+                <select id="updateStatus">
+                    <option value="pending_payment">待支付</option>
+                    <option value="paid">已支付</option>
+                    <option value="processing">处理中</option>
+                    <option value="shipped">已发货</option>
+                    <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>快递单号</label>
+                <input type="text" id="trackingNumber" placeholder="输入顺丰快递单号">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="orderNotes" rows="3" placeholder="添加备注信息"></textarea>
+            </div>
+            <button class="btn btn-success" onclick="updateOrder()">保存更新</button>
+            <button class="btn btn-danger" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        let currentOrderId = null;
+        let adminApiKey = localStorage.getItem('adminApiKey') || '';
+
+        // 页面加载时检查 API Key
+        window.onload = function() {
+            if (adminApiKey) {
+                document.getElementById('adminApiKey').value = adminApiKey;
+                loadOrders();
+            } else {
+                alert('⚠️ 请先输入管理员 API Key');
+            }
+        };
+
+        function saveAdminKey() {
+            const key = document.getElementById('adminApiKey').value.trim();
+            if (!key) {
+                alert('❌ 请输入 API Key');
+                return;
+            }
+            if (!key.startsWith('fsk_admin_')) {
+                alert('❌ 无效的管理员 API Key 格式');
+                return;
+            }
+            adminApiKey = key;
+            localStorage.setItem('adminApiKey', key);
+            alert('✅ API Key 已保存');
+            loadOrders();
+        }
+
+        async function loadOrders() {
+            if (!adminApiKey) {
+                alert('⚠️ 请先输入管理员 API Key');
+                return;
+            }
+
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchInput').value;
+            
+            let url = `${API_BASE_URL}/api/admin/orders?limit=50`;
+            if (status) url += `&status=${status}`;
+            if (search) url += `&search=${search}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Admin-Key': adminApiKey
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    displayOrders(data.data);
+                    updateStats(data.statistics);
+                } else {
+                    alert('加载失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+
+        function displayOrders(orders) {
+            const tbody = document.getElementById('ordersBody');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">暂无订单</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td><strong>${order.order_number}</strong></td>
+                    <td>
+                        ${order.shipping.name}<br>
+                        <small>${order.shipping.phone}</small>
+                    </td>
+                    <td>
+                        ${order.product.name}<br>
+                        <small>x${order.quantity}</small>
+                    </td>
+                    <td>
+                        ${order.total_price} ${order.currency}<br>
+                        <small>${order.payment.amount} ${order.payment.currency}</small>
+                    </td>
+                    <td>
+                        ${order.payment.tx_hash ? 
+                            `<small title="${order.payment.tx_hash}">✅ ${order.payment.tx_hash.substring(0, 10)}...</small>` : 
+                            '<small>未支付</small>'}
+                    </td>
+                    <td><span class="status ${order.status}">${getStatusText(order.status)}</span></td>
+                    <td><small>${new Date(order.created_at).toLocaleString('zh-CN')}</small></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewOrder('${order.order_id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats(stats) {
+            document.getElementById('stat-pending').textContent = stats.by_status.pending_payment || 0;
+            document.getElementById('stat-paid').textContent = stats.by_status.paid || 0;
+            document.getElementById('stat-shipped').textContent = stats.by_status.shipped || 0;
+            document.getElementById('stat-completed').textContent = stats.by_status.completed || 0;
+        }
+
+        async function viewOrder(orderId) {
+            currentOrderId = orderId;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}`, {
+                    headers: {
+                        'X-Admin-Key': adminApiKey
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const order = data.data;
+                    document.getElementById('orderDetails').innerHTML = `
+                        <p><strong>订单号:</strong> ${order.order_number}</p>
+                        <p><strong>客户:</strong> ${order.shipping.name} (${order.customer.email || 'N/A'})</p>
+                        <p><strong>电话:</strong> ${order.shipping.phone}</p>
+                        <p><strong>地址:</strong> ${order.shipping.address}, ${order.shipping.city}, ${order.shipping.country} ${order.shipping.postal_code}</p>
+                        <p><strong>产品:</strong> ${order.product.name} x${order.quantity}</p>
+                        <p><strong>金额:</strong> ${order.total_price} ${order.currency}</p>
+                        <p><strong>支付:</strong> ${order.payment.amount} ${order.payment.currency}</p>
+                        <p><strong>交易哈希:</strong> ${order.payment.tx_hash || '未提供'}</p>
+                        <p><strong>当前状态:</strong> <span class="status ${order.status}">${getStatusText(order.status)}</span></p>
+                        <p><strong>快递单号:</strong> ${order.shipping.tracking_number || '未填写'}</p>
+                        <p><strong>备注:</strong> ${order.notes || '无'}</p>
+                        <hr style="margin: 15px 0;">
+                    `;
+                    
+                    document.getElementById('updateStatus').value = order.status;
+                    document.getElementById('trackingNumber').value = order.shipping.tracking_number || '';
+                    document.getElementById('orderNotes').value = order.notes || '';
+                    
+                    document.getElementById('orderModal').style.display = 'block';
+                } else {
+                    alert('加载订单失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+
+        async function updateOrder() {
+            const status = document.getElementById('updateStatus').value;
+            const trackingNumber = document.getElementById('trackingNumber').value;
+            const notes = document.getElementById('orderNotes').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/orders/${currentOrderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Key': adminApiKey
+                    },
+                    body: JSON.stringify({
+                        status,
+                        tracking_number: trackingNumber,
+                        notes,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ 订单更新成功！');
+                    closeModal();
+                    loadOrders();
+                } else {
+                    alert('❌ 更新失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ 网络错误: ' + error.message);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('orderModal').style.display = 'none';
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending_payment': '待支付',
+                'paid': '已支付',
+                'processing': '处理中',
+                'shipped': '已发货',
+                'completed': '已完成',
+                'cancelled': '已取消',
+            };
+            return statusMap[status] || status;
+        }
+
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadOrders();
+            }, 500);
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 不自动加载，等待用户输入 API Key
+    </script>
+</body>
+</html>

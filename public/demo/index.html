@@ -763,26 +763,49 @@
                     result.innerHTML = `
                         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-top: 20px;">
                             <h3>订单详情</h3>
-                            <p><strong>订单号:</strong> ${order.order_id}</p>
+                            <p><strong>订单号:</strong> ${order.order_number}</p>
                             <p><strong>状态:</strong> ${statusText[order.status] || order.status}</p>
-                            <p><strong>产品:</strong> ${order.product.name} x ${order.product.quantity}</p>
-                            <p><strong>总价:</strong> ${order.total_amount.hkd} HKD</p>
+                            <p><strong>产品:</strong> ${order.product.name} x ${order.quantity}</p>
+                            <p><strong>总价:</strong> ${order.total_price} ${order.currency}</p>
                             
                             <h4 style="margin-top: 20px;">支付信息</h4>
                             <p><strong>币种:</strong> ${order.payment.currency}</p>
                             <p><strong>金额:</strong> ${order.payment.amount} ${order.payment.currency}</p>
                             <p><strong>地址:</strong> <span style="word-break: break-all;">${order.payment.address}</span></p>
+                            <button class="copy-btn" onclick="copyText('${order.payment.address}')">复制地址</button>
+                            
+                            ${order.payment.qr_code ? `
+                                <div class="qr-code">
+                                    <img src="${order.payment.qr_code}" alt="Payment QR Code">
+                                </div>
+                            ` : ''}
+                            
                             ${order.payment.tx_hash ? `<p><strong>交易哈希:</strong> ${order.payment.tx_hash}</p>` : ''}
-                            ${order.payment.confirmations ? `<p><strong>确认数:</strong> ${order.payment.confirmations}</p>` : ''}
+                            
+                            ${order.status === 'pending_payment' && !order.payment.tx_hash ? `
+                                <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                                    <h4>✅ 确认支付</h4>
+                                    <p style="margin-bottom: 10px;">完成支付后，请输入交易哈希（Transaction Hash）：</p>
+                                    <input type="text" id="txHashInput" placeholder="输入交易哈希" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px;">
+                                    <button class="btn" onclick="confirmPayment('${order.order_id}', '${apiKey}')" style="width: auto; padding: 10px 20px;">提交支付确认</button>
+                                </div>
+                            ` : ''}
                             
                             <h4 style="margin-top: 20px;">配送信息</h4>
                             <p><strong>收件人:</strong> ${order.shipping.name}</p>
-                            <p><strong>地址:</strong> ${order.shipping.address}</p>
-                            ${order.shipping.tracking_number ? `<p><strong>快递单号:</strong> ${order.shipping.tracking_number}</p>` : ''}
+                            <p><strong>电话:</strong> ${order.shipping.phone}</p>
+                            <p><strong>地址:</strong> ${order.shipping.address}, ${order.shipping.city}, ${order.shipping.country} ${order.shipping.postal_code}</p>
+                            ${order.shipping.tracking_number ? `
+                                <p style="background: #d4edda; padding: 10px; border-radius: 6px; margin-top: 10px;">
+                                    <strong>📦 顺丰快递单号:</strong> ${order.shipping.tracking_number}
+                                </p>
+                            ` : ''}
                             
                             <p style="margin-top: 15px; color: #666;">
                                 <strong>创建时间:</strong> ${new Date(order.created_at).toLocaleString('zh-CN')}
                             </p>
+                            ${order.paid_at ? `<p style="color: #666;"><strong>支付时间:</strong> ${new Date(order.paid_at).toLocaleString('zh-CN')}</p>` : ''}
+                            ${order.shipped_at ? `<p style="color: #666;"><strong>发货时间:</strong> ${new Date(order.shipped_at).toLocaleString('zh-CN')}</p>` : ''}
                         </div>
                     `;
                     result.classList.remove('hidden');
@@ -812,6 +835,41 @@
             navigator.clipboard.writeText(text).then(() => {
                 alert('已复制到剪贴板！');
             });
+        }
+
+        // 确认支付
+        async function confirmPayment(orderId, apiKey) {
+            const txHash = document.getElementById('txHashInput').value.trim();
+            
+            if (!txHash) {
+                alert('❌ 请输入交易哈希！');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/orders/${orderId}/payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        tx_hash: txHash
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ 支付确认成功！我们将尽快处理您的订单并安排发货。');
+                    // 重新查询订单以更新显示
+                    document.getElementById('checkOrderForm').dispatchEvent(new Event('submit'));
+                } else {
+                    alert('❌ 确认失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ 网络错误: ' + error.message);
+            }
         }
     </script>
 </body>
