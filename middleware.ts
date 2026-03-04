@@ -42,15 +42,13 @@ export async function middleware(request: NextRequest) {
   
   // Allow public routes
   if (publicRoutes.some(route => path.startsWith(route))) {
-    // Only POST to /api/v1/api-keys is public
-    if (path.startsWith('/api/v1/api-keys') && request.method !== 'POST') {
-      // Continue to authentication check
-    } else if (path.startsWith('/api/v1/products') && request.method === 'GET') {
-      // GET products is public
+    if (path === '/api/health') {
       return NextResponse.next();
-    } else if (path === '/api/health') {
+    }
+    if (path === '/api/v1/api-keys' && request.method === 'POST') {
       return NextResponse.next();
-    } else if (path.startsWith('/api/v1/api-keys') && request.method === 'POST') {
+    }
+    if (path === '/api/v1/products' && request.method === 'GET') {
       return NextResponse.next();
     }
   }
