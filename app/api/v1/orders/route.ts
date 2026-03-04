@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { generateOrderNumber, generatePaymentAddress, generateQRCode } from '@/lib/utils';
+import { generateOrderNumber } from '@/lib/utils';
+import { convertHKDToCrypto, getPaymentAddress, generateQRCodeUrl } from '@/lib/payment';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,22 +43,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate total price
+    // Calculate total price in HKD
     const totalPrice = product.price * quantity;
 
-    // Generate payment address
-    const paymentAddress = generatePaymentAddress(payment_currency);
+    // Get unified payment address
+    const paymentAddress = getPaymentAddress(payment_currency);
     
-    // Mock exchange rate (should use real API)
-    const exchangeRates: { [key: string]: number } = {
-      BTC: 0.000015,
-      ETH: 0.00025,
-      USDT: 0.13,
-      TRX: 8.5,
-    };
+    // Convert HKD to crypto amount
+    const paymentAmount = convertHKDToCrypto(totalPrice, payment_currency);
     
-    const paymentAmount = totalPrice * (exchangeRates[payment_currency] || 1);
-    const qrCode = generateQRCode(paymentAddress, paymentAmount, payment_currency);
+    // Generate QR code
+    const qrCode = generateQRCodeUrl(payment_currency, paymentAddress, paymentAmount);
 
     // Create order
     const order = await prisma.order.create({
@@ -95,10 +91,12 @@ export async function POST(request: NextRequest) {
           id: order.product.id,
           name: order.product.name,
           brand: order.product.brand,
+          quantity: order.quantity,
         },
-        quantity: order.quantity,
-        total_price: order.totalPrice,
-        currency: order.currency,
+        total_amount: {
+          hkd: order.totalPrice,
+          currency: order.currency,
+        },
         payment: {
           currency: order.paymentCurrency,
           amount: order.paymentAmount,
