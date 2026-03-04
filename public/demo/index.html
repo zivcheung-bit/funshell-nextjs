@@ -489,7 +489,16 @@
             if (tabName === 'browse-products') {
                 loadProducts();
             } else if (tabName === 'create-order') {
+                // 自动填充 API Key
+                if (currentApiKey) {
+                    document.getElementById('orderApiKey').value = currentApiKey;
+                }
                 loadProductsForOrder();
+            } else if (tabName === 'check-order') {
+                // 自动填充 API Key
+                if (currentApiKey) {
+                    document.getElementById('checkApiKey').value = currentApiKey;
+                }
             }
         }
 

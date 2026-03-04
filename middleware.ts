@@ -2,12 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function middleware(request: NextRequest) {
-  // Skip middleware for public routes
-  const publicRoutes = ['/api/health', '/api/v1/api-keys'];
   const path = request.nextUrl.pathname;
   
-  if (publicRoutes.some(route => path.startsWith(route)) && request.method === 'POST') {
-    return NextResponse.next();
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    '/api/health',
+    '/api/v1/api-keys',  // POST only for creating API keys
+    '/api/v1/products',  // GET products is public
+  ];
+  
+  // Allow public routes
+  if (publicRoutes.some(route => path.startsWith(route))) {
+    // Only POST to /api/v1/api-keys is public
+    if (path.startsWith('/api/v1/api-keys') && request.method !== 'POST') {
+      // Continue to authentication check
+    } else if (path.startsWith('/api/v1/products') && request.method === 'GET') {
+      // GET products is public
+      return NextResponse.next();
+    } else if (path === '/api/health') {
+      return NextResponse.next();
+    } else if (path.startsWith('/api/v1/api-keys') && request.method === 'POST') {
+      return NextResponse.next();
+    }
   }
 
   // Check API key for protected routes
