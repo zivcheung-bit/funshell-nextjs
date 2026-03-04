@@ -107,7 +107,14 @@ export async function PATCH(
       );
     }
 
-    const updateData: any = {};
+    const updateData: {
+      status?: string;
+      shippedAt?: Date;
+      completedAt?: Date;
+      cancelledAt?: Date;
+      trackingNumber?: string | null;
+      notes?: string | null;
+    } = {};
 
     // 更新状态
     if (status) {
