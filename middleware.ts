@@ -7,9 +7,15 @@ export async function middleware(request: NextRequest) {
   // Public routes that don't require authentication
   const publicRoutes = [
     '/api/health',
+    '/api/admin',  // Admin routes (temporary for setup)
     '/api/v1/api-keys',  // POST only for creating API keys
     '/api/v1/products',  // GET products is public
   ];
+  
+  // Allow admin routes (temporary)
+  if (path.startsWith('/api/admin')) {
+    return NextResponse.next();
+  }
   
   // Allow public routes
   if (publicRoutes.some(route => path.startsWith(route))) {
