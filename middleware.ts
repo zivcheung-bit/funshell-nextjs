@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// Force Node.js runtime for Prisma compatibility
-export const runtime = 'nodejs';
+// Middleware 不支持 Node.js runtime，所以我们需要移除 Prisma 调用
+// 认证逻辑将在各个路由内部处理
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    '/api/health',
-    '/api/v1/api-keys',  // POST only for creating API keys
-    '/api/v1/products',  // GET products is public
-  ];
   
   // Admin routes require admin API key
   if (path.startsWith('/api/admin')) {
@@ -38,25 +31,27 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    // In production, you should store admin keys in database
-    // For now, we just validate the format
+    // Format validation passed, let route handle database validation
     return NextResponse.next();
   }
   
-  // Allow public routes
+  // Public routes
+  const publicRoutes = [
+    '/api/health',
+    '/api/v1/products',
+  ];
+  
   if (publicRoutes.some(route => path.startsWith(route))) {
-    if (path === '/api/health') {
-      return NextResponse.next();
-    }
-    if (path === '/api/v1/api-keys' && request.method === 'POST') {
-      return NextResponse.next();
-    }
-    if (path === '/api/v1/products' && request.method === 'GET') {
-      return NextResponse.next();
-    }
+    return NextResponse.next();
+  }
+  
+  // API key creation is public
+  if (path === '/api/v1/api-keys' && request.method === 'POST') {
+    return NextResponse.next();
   }
 
-  // Check API key for protected routes
+  // For other /api/v1/ routes, just check if API key header exists
+  // Actual validation will be done in the route handler
   if (path.startsWith('/api/v1/')) {
     const apiKey = request.headers.get('x-api-key');
     
@@ -67,37 +62,8 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    try {
-      const key = await prisma.apiKey.findUnique({
-        where: { key: apiKey, isActive: true }
-      });
-
-      if (!key) {
-        console.error('API key not found or inactive:', apiKey.substring(0, 10) + '...');
-        return NextResponse.json(
-          { success: false, error: 'Invalid or inactive API key' },
-          { status: 401 }
-        );
-      }
-
-      console.log('API key validated:', key.id);
-
-      // Add API key info to request headers
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-api-key-id', key.id);
-      
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    } catch (error) {
-      console.error('Middleware authentication error:', error);
-      return NextResponse.json(
-        { success: false, error: 'Authentication failed', details: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 500 }
-      );
-    }
+    // Pass through to route handler for database validation
+    return NextResponse.next();
   }
 
   return NextResponse.next();

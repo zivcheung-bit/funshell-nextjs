@@ -15,7 +15,30 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params;
-    const apiKeyId = request.headers.get('x-api-key-id');
+    
+    // Validate API key
+    const apiKey = request.headers.get('x-api-key');
+    
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: 'API key is required' },
+        { status: 401 }
+      );
+    }
+
+    // Find and validate API key
+    const key = await prisma.apiKey.findUnique({
+      where: { key: apiKey, isActive: true }
+    });
+
+    if (!key) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or inactive API key' },
+        { status: 401 }
+      );
+    }
+
+    const apiKeyId = key.id;
     const body = await request.json();
     
     const { tx_hash } = body;
