@@ -10,7 +10,7 @@ export function generateApiKey(): string {
 }
 
 export function generateToken(payload: Record<string, unknown>): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as string });
 }
 
 export function verifyToken(token: string): Record<string, unknown> | null {
