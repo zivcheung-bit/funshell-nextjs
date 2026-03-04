@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // 获取所有订单（管理员）
 export async function GET(request: NextRequest) {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search'); // 搜索订单号或客户信息
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     
     if (status) {
       where.status = status;
