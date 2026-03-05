@@ -8,7 +8,7 @@ export const products = [
     price: 399,
     currency: "HKD",
     description: "开源硬件钱包，支持蓝牙连接，安全芯片保护",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fonekey-classic-1s.jpg",
+    image: "/images/products/onekey-classic-1s.svg",
     stock: 50,
     features: ["蓝牙连接", "开源固件", "安全芯片", "支持1000+币种"]
   },
@@ -19,7 +19,7 @@ export const products = [
     price: 1299,
     currency: "HKD",
     description: "专业级硬件钱包，触摸屏操作，支持NFT显示",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fonekey-pro.jpg",
+    image: "/images/products/onekey-pro.svg",
     stock: 30,
     features: ["触摸屏", "NFT显示", "蓝牙+USB", "开源固件"]
   },
@@ -30,7 +30,7 @@ export const products = [
     price: 299,
     currency: "HKD",
     description: "便携式硬件钱包，小巧轻便，适合日常使用",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fonekey-mini.jpg",
+    image: "/images/products/onekey-mini.svg",
     stock: 100,
     features: ["超便携", "USB-C", "开源", "性价比高"]
   },
@@ -43,7 +43,7 @@ export const products = [
     price: 1580,
     currency: "HKD",
     description: "支持蓝牙连接的硬件钱包，可管理5500+加密资产",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fledger-nano-x.jpg",
+    image: "/images/products/ledger-nano-x.svg",
     stock: 50,
     features: ["蓝牙连接", "100+币种", "移动端支持", "安全芯片"]
   },
@@ -54,7 +54,7 @@ export const products = [
     price: 980,
     currency: "HKD",
     description: "升级版Nano S，更大屏幕，支持更多应用",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fledger-nano-s-plus.jpg",
+    image: "/images/products/ledger-nano-s-plus.svg",
     stock: 100,
     features: ["USB连接", "大屏幕", "5500+资产", "性价比高"]
   },
@@ -65,7 +65,7 @@ export const products = [
     price: 3280,
     currency: "HKD",
     description: "E-Ink触摸屏，由iPod之父设计，旗舰级硬件钱包",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fledger-stax.jpg",
+    image: "/images/products/ledger-stax.svg",
     stock: 20,
     features: ["E-Ink屏幕", "无线充电", "蓝牙", "NFT显示"]
   },
@@ -78,7 +78,7 @@ export const products = [
     price: 2380,
     currency: "HKD",
     description: "触摸屏硬件钱包，开源固件，支持1000+币种",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Ftrezor-model-t.jpg",
+    image: "/images/products/trezor-model-t.svg",
     stock: 30,
     features: ["触摸屏", "开源固件", "USB-C", "密码管理"]
   },
@@ -89,7 +89,7 @@ export const products = [
     price: 1180,
     currency: "HKD",
     description: "新一代Trezor，安全芯片+开源固件",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Ftrezor-safe-3.jpg",
+    image: "/images/products/trezor-safe-3.svg",
     stock: 50,
     features: ["安全芯片", "开源", "USB-C", "触摸按钮"]
   },
@@ -102,7 +102,7 @@ export const products = [
     price: 899,
     currency: "HKD",
     description: "国产硬件钱包，支持多链资产管理",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fkeypal-pro.jpg",
+    image: "/images/products/keypal-pro.svg",
     stock: 60,
     features: ["多链支持", "中文界面", "USB-C", "安全芯片"]
   },
@@ -115,7 +115,7 @@ export const products = [
     price: 799,
     currency: "HKD",
     description: "CC EAL6+安全芯片，银行级安全标准",
-    image: "https://funshell.io/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fproduction%2Fimkey-pro.jpg",
+    image: "/images/products/imkey-pro.svg",
     stock: 40,
     features: ["EAL6+芯片", "蓝牙连接", "中文支持", "多链资产"]
   }
