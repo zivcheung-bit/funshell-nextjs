@@ -20,7 +20,7 @@ async function main() {
         price: product.price,
         currency: product.currency,
         description: product.description,
-        image: product.image,
+        imageUrl: product.image,
         stock: product.stock,
         features: product.features,
       },
