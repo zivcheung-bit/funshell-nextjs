@@ -1,0 +1,292 @@
+{
+  "agent_workflow": {
+    "name": "Funshell Cold Wallet Purchase Flow",
+    "version": "1.0.0",
+    "base_url": "https://funshell-nextjs.vercel.app",
+    "steps": [
+      {
+        "step": 1,
+        "name": "create_api_key",
+        "description": "Create API key for authentication",
+        "required": true,
+        "frequency": "once",
+        "endpoint": {
+          "method": "POST",
+          "path": "/api/v1/api-keys",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "name": "string (required)",
+            "email": "string (required)",
+            "agentType": "string (optional)",
+            "description": "string (optional)"
+          }
+        },
+        "success_response": {
+          "success": true,
+          "data": {
+            "key": "string - SAVE THIS"
+          }
+        },
+        "agent_actions": [
+          "Save the API key to persistent storage",
+          "Use this key in all subsequent requests",
+          "Report to user: 'API access credential obtained'"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "browse_products",
+        "description": "List available products",
+        "required": true,
+        "frequency": "as_needed",
+        "endpoint": {
+          "method": "GET",
+          "path": "/api/v1/products",
+          "headers": {},
+          "authentication": "none"
+        },
+        "success_response": {
+          "success": true,
+          "data": [
+            {
+              "id": "string",
+              "name": "string",
+              "brand": "string",
+              "model": "string",
+              "price": "number",
+              "currency": "HKD",
+              "stock": "number",
+              "description": "string",
+              "features": ["array"]
+            }
+          ]
+        },
+        "agent_decisions": {
+          "if_user_not_specified_product": "List all products with comparison",
+          "if_user_specified_product": "Match product by name/brand/model",
+          "if_stock_insufficient": "Suggest alternative products"
+        },
+        "agent_actions": [
+          "Parse product list",
+          "Check stock availability",
+          "Present formatted product info to user",
+          "Wait for user selection or auto-recommend"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "create_order",
+        "description": "Create order and get payment info",
+        "required": true,
+        "frequency": "per_purchase",
+        "endpoint": {
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-API-Key": "string (from step 1)",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "product_id": "string (required)",
+            "quantity": "number (required)",
+            "payment_currency": "enum (required): BTC|ETH|BNB|SOL|DOGE|TRX",
+            "shipping": {
+              "name": "string (required)",
+              "phone": "string (required)",
+              "address": "string (required)",
+              "city": "string (required)",
+              "province": "string (required)",
+              "country": "string (required)",
+              "postal_code": "string (required)"
+            }
+          }
+        },
+        "success_response": {
+          "success": true,
+          "data": {
+            "order_id": "string - SAVE THIS",
+            "order_number": "string - SAVE THIS",
+            "payment": {
+              "currency": "string",
+              "amount": "string",
+              "address": "string",
+              "qr_code": "string"
+            }
+          }
+        },
+        "agent_decisions": {
+          "before_create": [
+            "Verify user provided shipping info",
+            "Confirm product ID and quantity",
+            "Confirm payment currency"
+          ],
+          "if_missing_info": "Ask user to provide missing fields",
+          "after_create": [
+            "Save order_id and order_number",
+            "Parse payment amount and address",
+            "Generate payment instructions"
+          ]
+        },
+        "agent_actions": [
+          "Save order_number and order_id",
+          "Send payment info to user with formatted message",
+          "Set reminder: check order status after 24 hours"
+        ],
+        "user_message_template": "📦 订单创建成功！\n\n订单号：{order_number}\n产品：{product_name}\n数量：{quantity}\n总价：{total_price} HKD\n\n💰 支付信息：\n币种：{currency}\n金额：{amount}\n地址：{address}\n\n⏰ 请在 24 小时内完成支付\n支付后请告诉我交易哈希（TX Hash）"
+      },
+      {
+        "step": 4,
+        "name": "wait_for_payment",
+        "description": "Wait for user to complete payment",
+        "required": true,
+        "frequency": "continuous",
+        "agent_behaviors": [
+          "Remind user to complete payment every 2 hours",
+          "Provide payment tutorial links",
+          "Answer payment-related questions"
+        ],
+        "common_questions": {
+          "how_to_get_tx_hash": "在您的钱包应用中完成转账后，会显示一个交易ID（TX Hash），通常是一串64位的字母数字组合，请复制发给我。",
+          "is_address_correct": "是的，这是我们的官方收款地址。您也可以扫描二维码支付。",
+          "can_change_currency": "可以，请告诉我您想用哪种币种，我会为您重新生成支付信息。"
+        }
+      },
+      {
+        "step": 5,
+        "name": "confirm_payment",
+        "description": "Submit transaction hash to confirm payment",
+        "required": true,
+        "frequency": "once_per_order",
+        "endpoint": {
+          "method": "POST",
+          "path": "/api/v1/orders/{order_id}/payment",
+          "headers": {
+            "X-API-Key": "string",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "tx_hash": "string (required, 64 hex characters)"
+          }
+        },
+        "success_response": {
+          "success": true,
+          "data": {
+            "status": "paid",
+            "payment": {
+              "tx_hash": "string",
+              "paid_at": "timestamp"
+            }
+          }
+        },
+        "agent_actions": [
+          "Validate tx_hash format (64 hex characters)",
+          "Submit payment confirmation",
+          "Report to user: 'Payment confirmed! We will ship within 1-2 business days'"
+        ],
+        "user_message_template": "✅ 支付已确认！\n\n订单号：{order_number}\n状态：已支付\n交易哈希：{tx_hash}\n\n我们将在 1-2 个工作日内发货\n您可以随时查询订单状态"
+      },
+      {
+        "step": 6,
+        "name": "track_order",
+        "description": "Query order status and tracking",
+        "required": false,
+        "frequency": "as_needed",
+        "endpoint": {
+          "method": "GET",
+          "path": "/api/v1/orders/{order_id}",
+          "headers": {
+            "X-API-Key": "string"
+          }
+        },
+        "success_response": {
+          "success": true,
+          "data": {
+            "order_id": "string",
+            "order_number": "string",
+            "status": "enum",
+            "tracking_number": "string (if shipped)",
+            "product": {},
+            "payment": {},
+            "shipping": {}
+          }
+        },
+        "status_meanings": {
+          "pending_payment": "待支付 - Remind user to pay",
+          "paid": "已支付 - Payment received, preparing shipment",
+          "processing": "处理中 - Preparing to ship",
+          "shipped": "已发货 - Provide tracking number",
+          "completed": "已完成 - Thank user",
+          "cancelled": "已取消 - Explain reason"
+        },
+        "agent_decisions": {
+          "pending_payment": "Remind user to pay ASAP, show payment info",
+          "paid": "Inform user payment received, ETA 1-2 days",
+          "processing": "Inform preparing shipment",
+          "shipped": "Provide tracking number and SF Express link",
+          "completed": "Thank for purchase, ask if need help",
+          "cancelled": "Explain cancellation reason, ask if want to reorder"
+        },
+        "agent_actions": [
+          "Poll order status every 6 hours",
+          "Notify user when status changes",
+          "Provide logistics tracking info"
+        ],
+        "tracking_url_template": "https://www.sf-express.com/cn/sc/dynamic_function/waybill/#search/bill-number/{tracking_number}"
+      }
+    ],
+    "error_handling": {
+      "invalid_api_key": {
+        "error": "Invalid or inactive API key",
+        "action": "Recreate API key, inform user: 'System credential expired, obtaining new one...'"
+      },
+      "insufficient_stock": {
+        "error": "Insufficient stock",
+        "action": "Suggest alternative products, ask if want to wait for restock"
+      },
+      "order_not_found": {
+        "error": "Order not found",
+        "action": "Check order number correctness, provide order query help"
+      },
+      "payment_timeout": {
+        "condition": "Order pending_payment > 48 hours",
+        "action": "Suggest creating new order"
+      }
+    },
+    "persistent_data": {
+      "api_key": "string",
+      "user_info": {
+        "name": "string",
+        "phone": "string",
+        "default_address": "string",
+        "preferred_currency": "string"
+      },
+      "active_orders": [
+        {
+          "order_id": "string",
+          "order_number": "string",
+          "status": "string",
+          "created_at": "timestamp",
+          "last_checked": "timestamp"
+        }
+      ]
+    },
+    "scheduled_tasks": {
+      "every_6_hours": [
+        "Check all active order statuses",
+        "Notify user if status changed"
+      ],
+      "every_24_hours": [
+        "Clean up completed orders (> 7 days)",
+        "Remind pending payment orders (> 12 hours)"
+      ]
+    },
+    "optimization_tips": {
+      "smart_recommendation": "Recommend products based on user budget and needs",
+      "proactive_service": "Notify user when order status changes",
+      "exception_handling": "Auto-retry on API errors, suggest alternatives on stock issues",
+      "user_experience": "Use emojis, formatted output, provide quick action buttons"
+    }
+  }
+}
