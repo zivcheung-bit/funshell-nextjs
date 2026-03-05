@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funshell - AI Agent 冷钱包购买平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .card .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .card .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .resources {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .resources h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .resource-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .resource-item:hover {
+            background: #e7f3ff;
+            transform: translateX(5px);
+        }
+
+        .resource-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resource-item p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+
+        .resource-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .resource-item a:hover {
+            text-decoration: underline;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            text-align: center;
+            color: white;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            margin-top: 60px;
+        }
+
+        .footer p {
+            opacity: 0.9;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+            
+            .hero p {
+                font-size: 1.2em;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="container">
+            <h1>🔐 Funshell</h1>
+            <p>AI Agent 友好的加密冷钱包购买平台</p>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Agent 自动化</h3>
+                    <p>完整的 Skill 定义</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <h3>多币种支付</h3>
+                    <p>支持 6 种加密货币</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚚</div>
+                    <h3>物流追踪</h3>
+                    <p>顺丰快递实时跟踪</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>安全可靠</h3>
+                    <p>API Key 认证机制</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="cards">
+            <a href="/agent/index.html" class="card">
+                <div class="card-icon">🤖</div>
+                <h2>Agent 接入指南</h2>
+                <p>完整的 AI Agent 接入文档，包含工作流程、API 说明和示例代码</p>
+                <span class="btn">查看指南 →</span>
+            </a>
+
+            <a href="/demo/index.html" class="card">
+                <div class="card-icon">🎨</div>
+                <h2>前端演示</h2>
+                <p>体验完整的购买流程，从浏览产品到订单追踪</p>
+                <span class="btn">打开演示 →</span>
+            </a>
+
+            <a href="/admin/index.html" class="card">
+                <div class="card-icon">⚙️</div>
+                <h2>管理后台</h2>
+                <p>订单管理、发货处理、数据统计</p>
+                <span class="btn">进入后台 →</span>
+            </a>
+        </div>
+
+        <div class="resources">
+            <h2>📚 开发者资源</h2>
+            <div class="resource-list">
+                <div class="resource-item">
+                    <h3>📖 <span>Agent Playbook</span></h3>
+                    <p>人类可读的详细操作手册，包含决策逻辑和错误处理</p>
+                    <a href="/AGENT_PLAYBOOK.md" download>下载 Markdown</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>⚙️ <span>Workflow JSON</span></h3>
+                    <p>机器可读的工作流配置，结构化的 API 端点定义</p>
+                    <a href="/AGENT_WORKFLOW.json" download>下载 JSON</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>🎯 <span>Skill Definition</span></h3>
+                    <p>标准化的 Skill 配置，支持主流 Agent 框架</p>
+                    <a href="/SKILL_DEFINITION.json" download>下载 JSON</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>📘 <span>Skill README</span></h3>
+                    <p>Skill 使用文档，包含集成方式和代码示例</p>
+                    <a href="/SKILL_README.md" download>下载 Markdown</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="resources">
+            <h2>🔗 API 端点</h2>
+            <div class="resource-list">
+                <div class="resource-item">
+                    <h3>🔑 <span>创建 API Key</span></h3>
+                    <p>POST /api/v1/api-keys</p>
+                    <a href="/agent/index.html#api">查看文档</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>📦 <span>浏览产品</span></h3>
+                    <p>GET /api/v1/products</p>
+                    <a href="/api/v1/products" target="_blank">测试接口</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>🛒 <span>创建订单</span></h3>
+                    <p>POST /api/v1/orders</p>
+                    <a href="/agent/index.html#api">查看文档</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>💳 <span>确认支付</span></h3>
+                    <p>POST /api/v1/orders/{id}/payment</p>
+                    <a href="/agent/index.html#api">查看文档</a>
+                </div>
+
+                <div class="resource-item">
+                    <h3>📊 <span>查询订单</span></h3>
+                    <p>GET /api/v1/orders/{id}</p>
+                    <a href="/agent/index.html#api">查看文档</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p><strong>Funshell 方贝科技</strong></p>
+            <p>专业的冷钱包销售平台 | AI Agent 友好的 API 设计</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">
+                技术支持: <a href="mailto:support@funshell.com" style="color: white;">support@funshell.com</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.8em; opacity: 0.8;">
+                © 2024 Funshell. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
