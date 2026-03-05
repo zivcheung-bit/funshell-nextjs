@@ -1,43 +1,34 @@
 import { PrismaClient } from '@prisma/client';
+import { products } from './products-data';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('开始更新产品图片...');
+  console.log('开始更新产品数据...');
 
-  // 更新产品图片
-  const products = [
-    {
-      name: 'Ledger Nano X',
-      imageUrl: 'https://shop.ledger.com/cdn/shop/files/Nano-X-Black_1.png?v=1724245191&width=1024',
-    },
-    {
-      name: 'Trezor Model T',
-      imageUrl: 'https://trezor.io/content/wysiwyg/Images/Trezor_Model_T/Trezor_Model_T_front.png',
-    },
-    {
-      name: 'Coldcard Mk4',
-      imageUrl: 'https://coldcard.com/static/images/mk4/coldcard-mk4-front.png',
-    },
-    {
-      name: 'Ledger Nano S Plus',
-      imageUrl: 'https://shop.ledger.com/cdn/shop/files/Nano-S-Plus-Black_1.png?v=1724245191&width=1024',
-    },
-    {
-      name: 'Trezor One',
-      imageUrl: 'https://trezor.io/content/wysiwyg/Images/Trezor_One/Trezor_One_front.png',
-    },
-  ];
+  // 1. 清空现有产品
+  await prisma.product.deleteMany({});
+  console.log('已清空现有产品');
 
+  // 2. 插入新产品
   for (const product of products) {
-    await prisma.product.updateMany({
-      where: { name: product.name },
-      data: { imageUrl: product.imageUrl },
+    const created = await prisma.product.create({
+      data: {
+        name: product.name,
+        brand: product.brand,
+        model: product.model,
+        price: product.price,
+        currency: product.currency,
+        description: product.description,
+        image: product.image,
+        stock: product.stock,
+        features: product.features,
+      },
     });
-    console.log(`✅ 已更新: ${product.name}`);
+    console.log(`✅ 创建产品: ${created.name}`);
   }
 
-  console.log('✅ 所有产品图片更新完成！');
+  console.log(`\n✅ 成功导入 ${products.length} 个产品！`);
 }
 
 main()

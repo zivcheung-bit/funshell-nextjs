@@ -6,6 +6,8 @@ export const PAYMENT_ADDRESSES = {
   SOL: 'FmwYStF61XEfbENrktmoqimonQ1gfV6jaKST9Feb4gBw',
   DOGE: 'DKh4wYNHWUNxsgeBzsNWmWwJVNaABLicEB',
   TRX: 'TKvRkkTm5AWLvfZX4iac6f5e7fq8Nwjrr7',
+  USDT_TRC20: 'TKvRkkTm5AWLvfZX4iac6f5e7fq8Nwjrr7', // 与 TRX 相同
+  USDT_ERC20: '0x80cf3f974daea135aa28cdc8a3574cbd94521c5b', // 与 ETH 相同
 };
 
 // 汇率配置 (HKD 对各币种的汇率，需要定期更新)
